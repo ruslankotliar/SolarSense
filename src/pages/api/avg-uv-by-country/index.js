@@ -1,11 +1,13 @@
+// pages/api/avgUV.js
 import fs from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
 
 export default async function handler(_, res) {
   try {
+    const filePath = path.join(process.cwd(), 'public', 'avg_uv_by_country', 'data.csv');
+
     const results = {};
-    const filePath = path.join(process.cwd(), 'public', 'skin_cancer', 'data.csv');
 
     // Read and parse the CSV file
     fs.createReadStream(filePath)

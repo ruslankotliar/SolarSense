@@ -7,8 +7,9 @@ import { useEffect, useState } from 'react';
 import styles from '@styles/Home.module.scss';
 
 const DEFAULT_CENTER = [48.2081, 16.3713]; // Vienna, Austria
-
-const zoomLevel = 4; // Example zoom level, adjust as needed
+const MIN_YEAR = 2004;
+const MAX_YEAR = 2011;
+const DEFAULT_ZOOM_LVL = 4; // Example zoom level, adjust as needed
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
 const getColorFromCases = (cases) => {
@@ -30,7 +31,7 @@ const getColorFromCases = (cases) => {
 
 export default function Home() {
   const [geoData, setGeoData] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(2010);
+  const [selectedYear, setSelectedYear] = useState(MAX_YEAR);
   const [yearlyData, setYearlyData] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [bounds, setBounds] = useState(null);
@@ -52,22 +53,41 @@ export default function Home() {
   //   }
   // }, [bounds, selectedYear]);
 
+  // Fetch the yearly skin cancer data
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSkinCancerData = async () => {
       try {
         const response = await fetch('/api/skin-cancer');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const { data } = await response.json();
-        console.log(data)
         setYearlyData(data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchData();
+    const fetchAvgByCountryData = async () => {
+      try {
+        const response = await fetch('/api/avg-uv-by-country');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const { data } = await response.json();
+        setAvgUVByCountry(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchSkinCancerData();
+    fetchAvgByCountryData();
+  }, []);
+
+  // Fetch the average UV data by country
+  useEffect(() => {
+    
   }, []);
 
   // This was used to generate the yearly UV data for each country data set
@@ -112,8 +132,8 @@ export default function Home() {
               <input
                 id="yearSlider"
                 type="range"
-                min={2004}
-                max={2013}
+                min={MIN_YEAR}
+                max={MAX_YEAR}
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                 style={{ width: '300px' }}
@@ -122,7 +142,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Map className={styles.homeMap} width="800" height="400" center={DEFAULT_CENTER} zoom={zoomLevel}>
+          <Map className={styles.homeMap} width="800" height="400" center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM_LVL}>
             {(props) => {
               const { TileLayer, GeoJSON, ImageOverlay, useMap } = props;
 
