@@ -10,6 +10,7 @@ const DEFAULT_CENTER = [48.2081, 16.3713]; // Vienna, Austria
 const MIN_YEAR = 2004;
 const MAX_YEAR = 2011;
 const DEFAULT_ZOOM_LVL = 4; // Example zoom level, adjust as needed
+const DEFAULT_AVG_ROUND = 3;
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
 const getColorFromCases = (cases) => {
@@ -32,10 +33,12 @@ const getColorFromCases = (cases) => {
 export default function Home() {
   const [geoData, setGeoData] = useState(null);
   const [selectedYear, setSelectedYear] = useState(MAX_YEAR);
+
   const [yearlyData, setYearlyData] = useState(null);
+  const [avgUVByCountry, setAvgUVByCountry] = useState(null);
+
   const [imageUrl, setImageUrl] = useState('');
   const [bounds, setBounds] = useState(null);
-  const [avgUVByCountry, setAvgUVByCountry] = useState({});
 
   // useEffect(() => {
   //   const fetchUVData = async () => {
@@ -81,13 +84,8 @@ export default function Home() {
       }
     };
 
-    fetchSkinCancerData();
-    fetchAvgByCountryData();
-  }, []);
-
-  // Fetch the average UV data by country
-  useEffect(() => {
-    
+    if (!yearlyData) fetchSkinCancerData();
+    if (!avgUVByCountry) fetchAvgByCountryData();
   }, []);
 
   // This was used to generate the yearly UV data for each country data set
@@ -170,6 +168,7 @@ export default function Home() {
                   {/* GeoJSON Layer */}
                   {(yearlyData && avgUVByCountry && geoData) && (
                     <GeoJSON
+                      key={selectedYear}
                       data={geoData}
                       style={(feature) => ({
                         fillColor: getCountryColor(feature.properties.name),
@@ -183,7 +182,7 @@ export default function Home() {
                       onEachFeature={(feature, layer) => {
                         const countryName = feature.properties.name;
                         const cases = Math.round(yearlyData[selectedYear][countryName]?.cases);
-                        const avg = avgUVByCountry[countryName];
+                        const avg = parseFloat(avgUVByCountry[selectedYear][countryName]?.avgUV).toFixed(DEFAULT_AVG_ROUND);
 
                         layer.bindPopup(
                           `<strong>${countryName}</strong><br/>Cases per year: ${cases || 'N/A'}<br/>UV Index: ${avg || 'N/A'}`

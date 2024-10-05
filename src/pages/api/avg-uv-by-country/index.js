@@ -20,7 +20,7 @@ export default async function handler(_, res) {
             if (!results[year]) {
               results[year] = {};
             }
-            results[year][country] = { cases: parseFloat(value) }; // Store values as numbers
+            results[year][country] = { avgUV: parseFloat(value) }; // Store values as numbers
           }
         }
       })
