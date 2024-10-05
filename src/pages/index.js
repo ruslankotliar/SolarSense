@@ -101,41 +101,36 @@ const yearlyMockData = {
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
 const getColorFromCases = (cases) => {
-  const minCases = 500;   // Minimum number of cases
-  const maxCases = 10000; // Maximum number of cases
+  const minCases = 500;
+  const maxCases = 10000;
 
-  // Calculate the ratio between the minimum and maximum cases
   const ratio = (cases - minCases) / (maxCases - minCases);
 
-  // Interpolate color: light yellow (for low cases) to dark red (for high cases)
   const interpolateColor = (start, end, factor) => {
-    const result = start + factor * (end - start);
-    return Math.round(result);
+    return Math.round(start + factor * (end - start));
   };
 
-  const r = interpolateColor(255, 189, ratio); // Red value from yellow (255) to dark red (189)
-  const g = interpolateColor(237, 0, ratio);   // Green value from yellow (237) to dark red (0)
-  const b = interpolateColor(160, 38, ratio);  // Blue value from yellow (160) to dark red (38)
+  const r = interpolateColor(255, 189, ratio);
+  const g = interpolateColor(237, 0, ratio);
+  const b = interpolateColor(160, 38, ratio);
 
   return `rgb(${r}, ${g}, ${b})`;
 };
 
 export default function Home() {
   const [geoData, setGeoData] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(2020); // Default year
+  const [selectedYear, setSelectedYear] = useState(2020);
   const [mockData, setMockData] = useState(yearlyMockData[selectedYear]);
 
-  // Fetch the GeoJSON data when the component loads
   useEffect(() => {
     const fetchGeoJSON = async () => {
-      const response = await fetch('leaflet/geojson/europe.geo.json'); // Path to your GeoJSON file
+      const response = await fetch('leaflet/geojson/europe.geo.json');
       const data = await response.json();
       setGeoData(data);
     };
     fetchGeoJSON();
   }, []);
 
-  // Update the data when the selected year changes
   useEffect(() => {
     setMockData(yearlyMockData[selectedYear]);
   }, [selectedYear]);
@@ -155,19 +150,25 @@ export default function Home() {
 
       <Section>
         <Container>
-          {/* Year Selector */}
-          <div>
-            <label htmlFor="yearSelect">Select Year: </label>
-            <select
-              id="yearSelect"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            >
-              <option value={2020}>2020</option>
-              <option value={2021}>2021</option>
-              <option value={2022}>2022</option>
-              {/* Add more years as needed */}
-            </select>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: '20px',
+          }}>
+            <div>
+              <label htmlFor="yearSlider" >Select Year: </label>
+              <input
+                id="yearSlider"
+                type="range"
+                min={2020}
+                max={2022}
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                style={{ width: '300px' }} // Set width for the slider
+              />
+              <span style={{ marginLeft: '10px' }}>{selectedYear}</span> {/* Display the selected year */}
+            </div>
           </div>
 
           <Map className={styles.homeMap} width="800" height="400" center={DEFAULT_CENTER} zoom={4}>
@@ -179,12 +180,11 @@ export default function Home() {
                 />
                 {geoData && (
                   <GeoJSON
-                    data={geoData} // The GeoJSON data you fetched
+                    data={geoData}
                     style={(feature) => {
-                      // Extract the country name and apply a dynamic style
                       const countryName = feature.properties.name;
                       return {
-                        fillColor: getCountryColor(countryName), // Use dynamic color based on cases
+                        fillColor: getCountryColor(countryName),
                         weight: 2,
                         opacity: 1,
                         color: 'white',
@@ -197,8 +197,7 @@ export default function Home() {
                       const population = feature.properties.pop_est || 'N/A';
                       const gdp = feature.properties.gdp_md || 'N/A';
                       const cases = mockData[countryName]?.cases || 'N/A';
-                      
-                      // Bind popup content with more detailed information
+
                       layer.bindPopup(`
                         <strong>${countryName}</strong><br/>
                         Population: ${population}<br/>
