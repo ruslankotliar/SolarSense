@@ -11,6 +11,7 @@ const MIN_YEAR = 2004;
 const MAX_YEAR = 2011;
 const DEFAULT_ZOOM_LVL = 4; // Example zoom level, adjust as needed
 const DEFAULT_AVG_ROUND = 3;
+const DEFAULT_YEAR = 2008;
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
 const getColorFromCases = (cases) => {
@@ -32,7 +33,7 @@ const getColorFromCases = (cases) => {
 
 export default function Home() {
   const [geoData, setGeoData] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(MAX_YEAR);
+  const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR);
 
   const [yearlyData, setYearlyData] = useState(null);
   const [avgUVByCountry, setAvgUVByCountry] = useState(null);
@@ -124,9 +125,12 @@ export default function Home() {
 
       <Section>
         <Container>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-            <div>
-              <label htmlFor="yearSlider">Select Year: </label>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '40px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', maxWidth: '400px' }}>
+              {/* Min Year Label */}
+              <span style={{ fontSize: '14px' }}>{MIN_YEAR}</span>
+              
+              {/* Slider */}
               <input
                 id="yearSlider"
                 type="range"
@@ -134,13 +138,29 @@ export default function Home() {
                 max={MAX_YEAR}
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                style={{ width: '300px' }}
+                style={{
+                  flexGrow: 1,
+                  appearance: 'none',
+                  height: '6px',
+                  background: `linear-gradient(to right, #1e3a8a ${(selectedYear - MIN_YEAR) / (MAX_YEAR - MIN_YEAR) * 100}%, #ddd 0%)`,  // Dark blue gradient
+                  borderRadius: '5px',
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
               />
-              <span style={{ marginLeft: '10px' }}>{selectedYear}</span>
+              
+              {/* Max Year Label */}
+              <span style={{ fontSize: '14px' }}>{MAX_YEAR}</span>
             </div>
+            
+            {/* Display selected year */}
+            <strong style={{ marginTop: '10px', fontSize: '16px' }}>
+              Selected: <span style={{ color: '#1e3a8a' }}>{selectedYear}</span>
+            </strong>
           </div>
 
-          <Map className={styles.homeMap} width="800" height="400" center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM_LVL}>
+
+          <Map className={styles.homeMap} width="1000" height="500" center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM_LVL}>
             {(props) => {
               const { TileLayer, GeoJSON, ImageOverlay, useMap } = props;
 

@@ -13,6 +13,12 @@ const Header = () => {
             Solar Sense
           </Link>
         </p>
+
+        <p className={styles.headerSubtitle}>
+          <Link href="/">
+            Vienna | NASA Space Apps Challenge 2024
+          </Link>
+        </p>
       </Container>
     </header>
   );

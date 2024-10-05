@@ -56,3 +56,15 @@
     }
   }
 }
+
+
+.headerSubtitle {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+
+  // don't show this on mobile
+  @media (max-width: 720px) {
+    display: none;
+  }
+}

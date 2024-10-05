@@ -24,3 +24,11 @@
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
     Bitstream Vera Sans Mono, Courier New, monospace;
 }
+
+.mapWrapper {
+  aspect-ratio: 2 / 1;
+  
+  @media (max-width: 768px) {
+    aspect-ratio: 1 / 1.5;
+  }
+}
