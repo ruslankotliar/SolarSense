@@ -6,41 +6,7 @@ import Map from '@components/Map';
 import { useEffect, useState } from 'react';
 import styles from '@styles/Home.module.scss';
 
-const DEFAULT_CENTER = [48.2081, 16.3713];
-
-// Mock data for different years
-const yearlyMockData = {
-  2020: {
-    Austria: { cases: 5000 },
-    Belgium: { cases: 4000 },
-    Bulgaria: { cases: 3000 },
-    Croatia: { cases: 2000 },
-    Cyprus: { cases: 1000 },
-    Czechia: { cases: 4500 },
-    Denmark: { cases: 5500 },
-    Estonia: { cases: 500 },
-  },
-  2021: {
-    Austria: { cases: 5200 },
-    Belgium: { cases: 3900 },
-    Bulgaria: { cases: 2800 },
-    Croatia: { cases: 2100 },
-    Cyprus: { cases: 1100 },
-    Czechia: { cases: 4600 },
-    Denmark: { cases: 5700 },
-    Estonia: { cases: 550 },
-  },
-  2022: {
-    Austria: { cases: 5300 },
-    Belgium: { cases: 4100 },
-    Bulgaria: { cases: 2900 },
-    Croatia: { cases: 2200 },
-    Cyprus: { cases: 1200 },
-    Czechia: { cases: 4700 },
-    Denmark: { cases: 5900 },
-    Estonia: { cases: 600 },
-  },
-};
+const DEFAULT_CENTER = [48.2081, 16.3713]; // Vienna, Austria
 
 const zoomLevel = 4; // Example zoom level, adjust as needed
 
@@ -64,27 +30,45 @@ const getColorFromCases = (cases) => {
 
 export default function Home() {
   const [geoData, setGeoData] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(2022);
-  const [mockData, setMockData] = useState(yearlyMockData[selectedYear]);
+  const [selectedYear, setSelectedYear] = useState(2010);
+  const [yearlyData, setYearlyData] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [bounds, setBounds] = useState(null);
   const [avgUVByCountry, setAvgUVByCountry] = useState({});
 
+  // useEffect(() => {
+  //   const fetchUVData = async () => {
+  //     try {
+  //       const response = await fetch(`/api/meteomatics/getUVData?year=${selectedYear}&bounds=${bounds.toBBoxString()}`);
+  //       const data = await response.json();
+  //       setImageUrl(data.image);
+  //     } catch (err) {
+  //       console.error("Error fetching UV data:", err);
+  //     }
+  //   };
+
+  //   if (bounds && selectedYear) {
+  //     fetchUVData(); // Fetch UV data whenever bounds or selected year changes
+  //   }
+  // }, [bounds, selectedYear]);
+
   useEffect(() => {
-    const fetchUVData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`/api/meteomatics/getUVData?year=${selectedYear}&bounds=${bounds.toBBoxString()}`);
-        const data = await response.json();
-        setImageUrl(data.image);
-      } catch (err) {
-        console.error("Error fetching UV data:", err);
+        const response = await fetch('/api/skin-cancer');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const { data } = await response.json();
+        console.log(data)
+        setYearlyData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
     };
 
-    if (bounds && selectedYear) {
-      fetchUVData(); // Fetch UV data whenever bounds or selected year changes
-    }
-  }, [bounds, selectedYear]);
+    fetchData();
+  }, []);
 
   // This was used to generate the yearly UV data for each country data set
   // const getYearlyUVDataByCountry = async (coordinates) => {
@@ -107,12 +91,8 @@ export default function Home() {
     fetchGeoJSON();
   }, []);
 
-  useEffect(() => {
-    setMockData(yearlyMockData[selectedYear]);
-  }, [selectedYear]);
-
   const getCountryColor = (countryName) => {
-    const cases = mockData[countryName]?.cases;
+    const cases = yearlyData[countryName]?.cases;
     return cases ? getColorFromCases(cases) : 'gray';
   };
 
@@ -132,8 +112,8 @@ export default function Home() {
               <input
                 id="yearSlider"
                 type="range"
-                min={2015}
-                max={2022}
+                min={2004}
+                max={2013}
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                 style={{ width: '300px' }}
@@ -144,7 +124,7 @@ export default function Home() {
 
           <Map className={styles.homeMap} width="800" height="400" center={DEFAULT_CENTER} zoom={zoomLevel}>
             {(props) => {
-              const { TileLayer, GeoJSON, ImageOverlay, Rectangle, useMap } = props;
+              const { TileLayer, GeoJSON, ImageOverlay, useMap } = props;
 
               return (
                 <>
@@ -168,7 +148,7 @@ export default function Home() {
                   )}
 
                   {/* GeoJSON Layer */}
-                  {(avgUVByCountry && geoData) && (
+                  {(yearlyData && avgUVByCountry && geoData) && (
                     <GeoJSON
                       data={geoData}
                       style={(feature) => ({
@@ -180,11 +160,13 @@ export default function Home() {
                         fillOpacity: 0.7,
                         zIndex: 500,
                       })}
-                      onEachFeature={async (feature, layer) => {
+                      onEachFeature={(feature, layer) => {
                         const countryName = feature.properties.name;
+                        const cases = Math.round(yearlyData[selectedYear][countryName]?.cases);
+                        const avg = avgUVByCountry[countryName];
 
                         layer.bindPopup(
-                          `<strong>${countryName}</strong><br/>Cases: ${mockData[countryName]?.cases || 'N/A'}<br/>UV Index: ${avgUVByCountry[countryName] || 'N/A'}`
+                          `<strong>${countryName}</strong><br/>Cases per year: ${cases || 'N/A'}<br/>UV Index: ${avg || 'N/A'}`
                         );
                       }}
                     />
