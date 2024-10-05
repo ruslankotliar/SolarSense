@@ -39,7 +39,7 @@ export default function Home() {
   // useEffect(() => {
   //   const fetchUVData = async () => {
   //     try {
-  //       const response = await fetch(`/api/meteomatics/getUVData?year=${selectedYear}&bounds=${bounds.toBBoxString()}`);
+  //       const response = await fetch(`/api/meteomatics/uv-visual?year=${selectedYear}&bounds=${bounds.toBBoxString()}`);
   //       const data = await response.json();
   //       setImageUrl(data.image);
   //     } catch (err) {
@@ -73,7 +73,7 @@ export default function Home() {
   // This was used to generate the yearly UV data for each country data set
   // const getYearlyUVDataByCountry = async (coordinates) => {
   //   try {
-  //     const response = await fetch(`/api/meteomatics/getYearlyUVDataByCountry?year=${selectedYear}&coordinates=${coordinates}`);
+  //     const response = await fetch(`/api/meteomatics/avg-uv-by-country?year=${selectedYear}&coordinates=${coordinates}`);
   //     const data = await response.json();
   //     return data.avgUV;
   //   } catch (err) {
