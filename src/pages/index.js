@@ -12,6 +12,7 @@ const MAX_YEAR = 2011;
 const DEFAULT_ZOOM_LVL = 4; // Example zoom level, adjust as needed
 const DEFAULT_AVG_ROUND = 3;
 const DEFAULT_YEAR = 2008;
+const YEARS_AHEAD = 11;
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
 const getColorFromCases = (cases) => {
@@ -34,6 +35,7 @@ const getColorFromCases = (cases) => {
 export default function Home() {
   const [geoData, setGeoData] = useState(null);
   const [selectedYear, setSelectedYear] = useState(DEFAULT_YEAR);
+  const [showUVIndex, setShowUVIndex] = useState(false);
 
   const [yearlyData, setYearlyData] = useState(null);
   const [avgUVByCountry, setAvgUVByCountry] = useState(null);
@@ -41,21 +43,21 @@ export default function Home() {
   const [imageUrl, setImageUrl] = useState('');
   const [bounds, setBounds] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchUVData = async () => {
-  //     try {
-  //       const response = await fetch(`/api/meteomatics/uv-visual?year=${selectedYear}&bounds=${bounds.toBBoxString()}`);
-  //       const data = await response.json();
-  //       setImageUrl(data.image);
-  //     } catch (err) {
-  //       console.error("Error fetching UV data:", err);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUVData = async () => {
+      try {
+        const response = await fetch(`/api/meteomatics/uv-visual?year=${selectedYear + YEARS_AHEAD}&bounds=${bounds.toBBoxString()}`);
+        const data = await response.json();
+        setImageUrl(data.image);
+      } catch (err) {
+        console.error("Error fetching UV data:", err);
+      }
+    };
 
-  //   if (bounds && selectedYear) {
-  //     fetchUVData(); // Fetch UV data whenever bounds or selected year changes
-  //   }
-  // }, [bounds, selectedYear]);
+    if (bounds && selectedYear) {
+      fetchUVData(); // Fetch UV data whenever bounds or selected year changes
+    }
+  }, [bounds, selectedYear]);
 
   // Fetch the yearly skin cancer data
   useEffect(() => {
@@ -125,38 +127,66 @@ export default function Home() {
 
       <Section>
         <Container>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '40px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', maxWidth: '400px' }}>
-              {/* Min Year Label */}
-              <span style={{ fontSize: '14px' }}>{MIN_YEAR}</span>
-              
-              {/* Slider */}
-              <input
-                id="yearSlider"
-                type="range"
-                min={MIN_YEAR}
-                max={MAX_YEAR}
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                style={{
-                  flexGrow: 1,
-                  appearance: 'none',
-                  height: '6px',
-                  background: `linear-gradient(to right, #1e3a8a ${(selectedYear - MIN_YEAR) / (MAX_YEAR - MIN_YEAR) * 100}%, #ddd 0%)`,  // Dark blue gradient
-                  borderRadius: '5px',
-                  outline: 'none',
-                  cursor: 'pointer',
-                }}
-              />
-              
-              {/* Max Year Label */}
-              <span style={{ fontSize: '14px' }}>{MAX_YEAR}</span>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            width: '100%', 
+            marginBottom: '40px', 
+            alignItems: 'center' 
+          }}>
+            {/* Left side: Slider and Year */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {/* Slider Container */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', width: '100%', maxWidth: '400px' }}>
+                {/* Min Year Label */}
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{MIN_YEAR}</span>
+                
+                {/* Slider */}
+                <input
+                  id="yearSlider"
+                  type="range"
+                  min={MIN_YEAR}
+                  max={MAX_YEAR}
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  style={{
+                    flexGrow: 1,
+                    appearance: 'none',
+                    height: '8px',
+                    background: `linear-gradient(to right, #1e3a8a ${(selectedYear - MIN_YEAR) / (MAX_YEAR - MIN_YEAR) * 100}%, #ddd 0%)`,
+                    borderRadius: '8px',
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                />
+                
+                {/* Max Year Label */}
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{MAX_YEAR}</span>
+              </div>
+
+              {/* Selected Year Display */}
+              <p style={{ marginTop: '10px', fontSize: '16px' }}>
+                Selected: <strong style={{color: '#1e3a8a'}}>{selectedYear}</strong>
+              </p>
             </div>
-            
-            {/* Display selected year */}
-            <strong style={{ marginTop: '10px', fontSize: '16px' }}>
-              Selected: <span style={{ color: '#1e3a8a' }}>{selectedYear}</span>
-            </strong>
+
+            {/* Right side: UV Index Checkbox */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', cursor: 'pointer', color: '#333' }}>
+                <input
+                  type="checkbox"
+                  checked={showUVIndex}
+                  onChange={(e) => setShowUVIndex(e.target.checked)}
+                  style={{
+                    marginRight: '10px',
+                    width: '16px',
+                    height: '16px',
+                    cursor: 'pointer',
+                  }}
+                />
+                Show UV Index
+              </label>
+            </div>
           </div>
 
 
@@ -176,7 +206,7 @@ export default function Home() {
                   />
 
                   {/* UV Index ImageOverlay */}
-                  {(imageUrl && bounds) && (
+                  {(imageUrl && bounds && showUVIndex) && (
                     <ImageOverlay
                       url={imageUrl}
                       bounds={bounds}
