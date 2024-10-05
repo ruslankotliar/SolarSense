@@ -1,0 +1,12 @@
+Incidence by year - summary
+"FR  Gironde, Both sexes, Melanoma of the skin, All ages"
+"Years","Number","Crude rate","ASR (W)","ASR (E Old)","ASR (E New)","Cumulative Risk",
+2008,253,17.7,11.3,15.0,19.1,1.6,
+2009,225,15.6,10.0,13.2,16.6,1.4,
+2010,283,19.4,12.6,16.6,20.9,1.9,
+2011,327,22.2,13.5,18.2,23.8,2.1,
+2012,328,21.9,14.1,18.6,23.1,1.9,
+2013,345,22.8,14.3,18.8,24.1,2.1,
+Source: ECIS - European Cancer Information System
+From https://ecis.jrc.ec.europa.eu/, accessed on 5/9/2024
+(C) European union, 2024"

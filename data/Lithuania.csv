@@ -1,0 +1,15 @@
+Incidence by year - summary
+"LT   National, Both sexes, Melanoma of the skin, All ages"
+"Years","Number","Crude rate","ASR (W)","ASR (E Old)","ASR (E New)","Cumulative Risk",
+2004,245,7.3,4.8,6.5,8.3,0.8,
+2005,223,6.7,4.6,6.1,7.6,0.6,
+2006,237,7.3,4.7,6.4,8.2,0.7,
+2007,253,7.8,4.8,6.5,8.4,0.8,
+2008,273,8.5,5.2,7.0,9.4,0.8,
+2009,255,8.1,4.8,6.5,8.7,0.8,
+2010,321,10.4,6.3,8.4,10.9,1.0,
+2011,334,11.0,6.3,8.6,11.4,1.0,
+2012,303,10.1,5.9,7.9,10.4,1.0,
+Source: ECIS - European Cancer Information System
+From https://ecis.jrc.ec.europa.eu/, accessed on 5/9/2024
+(C) European union, 2024"

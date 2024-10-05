@@ -1,0 +1,16 @@
+Incidence by year - summary
+"FR  Doubs, Both sexes, Melanoma of the skin, All ages"
+"Years","Number","Crude rate","ASR (W)","ASR (E Old)","ASR (E New)","Cumulative Risk",
+2004,59,11.5,8.2,10.5,12.7,1.1,
+2005,80,15.5,10.8,13.9,17.4,1.4,
+2006,101,19.5,13.4,17.7,22.3,1.9,
+2007,75,14.4,10.2,13.2,15.7,1.4,
+2008,95,18.1,11.7,15.5,20.0,1.9,
+2009,91,17.3,10.8,14.6,19.4,1.7,
+2010,83,15.7,9.5,12.8,17.4,1.7,
+2011,82,15.5,9.7,12.8,16.9,1.5,
+2012,82,15.4,9.8,12.9,16.9,1.5,
+2013,90,16.9,10.4,13.9,17.9,1.5,
+Source: ECIS - European Cancer Information System
+From https://ecis.jrc.ec.europa.eu/, accessed on 5/9/2024
+(C) European union, 2024"
