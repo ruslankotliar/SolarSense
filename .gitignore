@@ -35,3 +35,4 @@ yarn-error.log*
 
 # jupyter checkpoints
 .ipynb_checkpoints/
+.env

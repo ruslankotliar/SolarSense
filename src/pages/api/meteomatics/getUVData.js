@@ -1,42 +1,35 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-
-async function auth() {
-  const username = "";
-  const password = "";
-  let headers = new Headers();
-  headers.set("Authorization", "Basic " + btoa(username + ":" + password));
-
-  return await fetch("https://login.meteomatics.com/api/v1/token", {
-    method: "GET",
-    headers: headers,
-  })
-    .then(function (resp) {
-      return resp.json();
-    })
-    .then(function (data) {
-      var token = data.access_token;
-      //console.log("token", token);
-      return token;
-    })
-    .catch(function (err) {
-      //console.log("something went wrong", err);
-      return err;
-    });
-}
+import authMeteometics from "src/utils/authMeteomatics";
 
 export default async function handler(req, res) {
-  const token = await auth();
-  //console.log(token);
-  const url = `https://api.meteomatics.com/2024-09-28T13:20:00.000+02:00/t_2m:C/48.3226679,16.181831_48.1179069,16.5775132:1024x1024/geotiff?model=mix&access_token=${token}`;
+  const token = await authMeteometics();
+
+  const { year, bounds } = req.query;
+  
+  // 'southwest_lng,southwest_lat,northeast_lng,northeast_lat'
+  const [southwestLng, southwestLat, northeastLng, northeastLat] = bounds.split(',');
+
+  const date = `${year}-07-01T13:00:00.000+01:00`;
+  const url = `https://api.meteomatics.com/${date}/uv:idx/${northeastLat},${southwestLng}_${southwestLat},${northeastLng}:0.1,0.1/png?model=mix&access_token=${token}`
 
   try {
-    const res = await fetch(url);
-    console.log(res);
-    const data = await res.json();
-    console.log(data);
-    res.status(200).json({ message: token });
+    const meteomaticsResponse = await fetch(url);
+    if (!meteomaticsResponse.ok) {
+      throw new Error('Failed to fetch UV data');
+    }
+
+    // Read the response body as a buffer
+    const buffer = await meteomaticsResponse.arrayBuffer();
+
+    // Convert ArrayBuffer to Buffer (Node.js Buffer)
+    const bufferNode = Buffer.from(buffer);
+
+    // Convert Buffer to Base64 string
+    const base64Image = bufferNode.toString('base64');
+
+    // Send the Base64 string as a response
+    res.status(200).json({ image: `data:image/png;base64,${base64Image}` });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: err });
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
 }
