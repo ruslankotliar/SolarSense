@@ -5,6 +5,7 @@ import Container from '@components/Container';
 import Map from '@components/Map';
 import { useEffect, useState } from 'react';
 import styles from '@styles/Home.module.scss';
+import useDebounce from 'src/hooks/useDebounce';
 
 const DEFAULT_CENTER = [48.2081, 16.3713]; // Vienna, Austria
 const MIN_YEAR = 2004;
@@ -43,10 +44,14 @@ export default function Home() {
   const [imageUrl, setImageUrl] = useState('');
   const [bounds, setBounds] = useState(null);
 
+  // Use debounce to control when to trigger API requests
+  const debouncedSelectedYear = useDebounce(selectedYear, 500); // 500ms delay
+
+  // Refetch UV data when debounced year changes, not the immediate one
   useEffect(() => {
     const fetchUVData = async () => {
       try {
-        const response = await fetch(`/api/meteomatics/uv-visual?year=${selectedYear + YEARS_AHEAD}&bounds=${bounds.toBBoxString()}`);
+        const response = await fetch(`/api/meteomatics/uv-visual?year=${debouncedSelectedYear + YEARS_AHEAD}&bounds=${bounds.toBBoxString()}`);
         const data = await response.json();
         setImageUrl(data.image);
       } catch (err) {
@@ -54,10 +59,10 @@ export default function Home() {
       }
     };
 
-    if (bounds && selectedYear) {
+    if (bounds && debouncedSelectedYear && showUVIndex) {
       fetchUVData(); // Fetch UV data whenever bounds or selected year changes
     }
-  }, [bounds, selectedYear]);
+  }, [bounds, debouncedSelectedYear, showUVIndex]);
 
   // Fetch the yearly skin cancer data
   useEffect(() => {
