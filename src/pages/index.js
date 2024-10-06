@@ -1,11 +1,11 @@
-import Head from "next/head";
-import Layout from "@components/Layout";
-import Section from "@components/Section";
-import Container from "@components/Container";
-import Map from "@components/Map";
-import { useEffect, useState } from "react";
-import styles from "@styles/Home.module.scss";
-import useDebounce from "src/hooks/useDebounce";
+import Head from 'next/head';
+import Layout from '@components/Layout';
+import Section from '@components/Section';
+import Container from '@components/Container';
+import Map from '@components/Map';
+import { useCallback, useEffect, useState } from 'react';
+import styles from '@styles/Home.module.scss';
+import useDebounce from 'src/hooks/useDebounce';
 
 const DEFAULT_CENTER = [48.2081, 16.3713]; // Vienna, Austria
 const MIN_YEAR = 2004;
@@ -16,10 +16,8 @@ const DEFAULT_YEAR = 2008;
 const YEARS_AHEAD = 11;
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
-const getColorFromCases = (cases) => {
-  const minCases = 500;
-  const maxCases = 10000;
-
+const getColorFromCases = (cases, [minCases, maxCases]) => {
+  console.log(minCases, maxCases);
   const ratio = (cases - minCases) / (maxCases - minCases);
 
   const interpolateColor = (start, end, factor) => {
@@ -41,7 +39,9 @@ export default function Home() {
   const [yearlyData, setYearlyData] = useState(null);
   const [avgUVByCountry, setAvgUVByCountry] = useState(null);
 
-  const [imageUrl, setImageUrl] = useState("");
+  const [casesRange, setCasesRange] = useState([0, 0]);
+
+  const [imageUrl, setImageUrl] = useState('');
   const [bounds, setBounds] = useState(null);
 
   // Use debounce to control when to trigger API requests
@@ -67,6 +67,16 @@ export default function Home() {
       fetchUVData(); // Fetch UV data whenever bounds or selected year changes
     }
   }, [bounds, debouncedSelectedYear, showUVIndex]);
+
+  useEffect(() => {
+    if (!yearlyData || !yearlyData[debouncedSelectedYear]) return;
+    const casesList = Object.values(yearlyData[debouncedSelectedYear]).map((country) => country.cases);
+
+    const minCases = Math.min(...casesList);
+    const maxCases = Math.max(...casesList);
+
+    setCasesRange([minCases, maxCases]);
+  }, [yearlyData, debouncedSelectedYear])
 
   // Fetch the yearly skin cancer data
   useEffect(() => {
@@ -121,10 +131,10 @@ export default function Home() {
     fetchGeoJSON();
   }, []);
 
-  const getCountryColor = (countryName) => {
-    const cases = yearlyData[countryName]?.cases;
-    return cases ? getColorFromCases(cases) : "gray";
-  };
+  const getCountryColor = useCallback((countryName) => {
+    const cases = yearlyData[selectedYear][countryName]?.cases;
+    return cases ? getColorFromCases(cases, casesRange) : 'gray';
+  }, [yearlyData, selectedYear, casesRange]);
 
   return (
     <Layout>

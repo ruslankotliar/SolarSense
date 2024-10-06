@@ -8,11 +8,19 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <Container className={styles.headerContainer}>
-        <p className={styles.headerTitle}>
-          <Link href="/">
-            Solar Sense
-          </Link>
-        </p>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <p className={styles.headerTitle}>
+            <Link href="/">
+              Solar Sense
+            </Link>
+          </p>
+
+          <p className={styles.headerSubtitle}>
+            <Link href="/charts">
+              Charts
+            </Link>
+          </p>
+        </div>
 
         <p className={styles.headerSubtitle}>
           <Link href="/">
