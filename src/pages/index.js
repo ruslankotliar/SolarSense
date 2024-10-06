@@ -17,7 +17,6 @@ const YEARS_AHEAD = 11;
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
 const getColorFromCases = (cases, [minCases, maxCases]) => {
-  console.log(cases, minCases, maxCases);
   const ratio = (cases - minCases) / (maxCases - minCases);
 
   const interpolateColor = (start, end, factor) => {

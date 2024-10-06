@@ -60,7 +60,6 @@ export default async function handler(req, res) {
                 const avgUV = totalUV / parseFloat(allDates.length);
         
                 newRes = { country, year, avgUV };
-                console.log("res: ", newRes, " | Dates length: ", allDates.length);
             }
 
             results.push(newRes);
