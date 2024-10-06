@@ -1,11 +1,11 @@
-import Head from 'next/head';
-import Layout from '@components/Layout';
-import Section from '@components/Section';
-import Container from '@components/Container';
-import Map from '@components/Map';
-import { useCallback, useEffect, useState } from 'react';
-import styles from '@styles/Home.module.scss';
-import useDebounce from 'src/hooks/useDebounce';
+import Head from "next/head";
+import Layout from "@components/Layout";
+import Section from "@components/Section";
+import Container from "@components/Container";
+import Map from "@components/Map";
+import { useCallback, useEffect, useState } from "react";
+import styles from "@styles/Home.module.scss";
+import useDebounce from "src/hooks/useDebounce";
 
 const DEFAULT_CENTER = [48.2081, 16.3713]; // Vienna, Austria
 const MIN_YEAR = 2004;
@@ -17,7 +17,7 @@ const YEARS_AHEAD = 11;
 
 // Function to map case numbers to a color on a gradient from light yellow to dark red
 const getColorFromCases = (cases, [minCases, maxCases]) => {
-  console.log(minCases, maxCases);
+  console.log(cases, minCases, maxCases);
   const ratio = (cases - minCases) / (maxCases - minCases);
 
   const interpolateColor = (start, end, factor) => {
@@ -28,6 +28,7 @@ const getColorFromCases = (cases, [minCases, maxCases]) => {
   const g = interpolateColor(237, 0, ratio);
   const b = interpolateColor(160, 38, ratio);
 
+  console.log(`rgb(${r}, ${g}, ${b})`);
   return `rgb(${r}, ${g}, ${b})`;
 };
 
@@ -41,7 +42,7 @@ export default function Home() {
 
   const [casesRange, setCasesRange] = useState([0, 0]);
 
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
   const [bounds, setBounds] = useState(null);
 
   // Use debounce to control when to trigger API requests
@@ -70,13 +71,15 @@ export default function Home() {
 
   useEffect(() => {
     if (!yearlyData || !yearlyData[debouncedSelectedYear]) return;
-    const casesList = Object.values(yearlyData[debouncedSelectedYear]).map((country) => country.cases);
+    const casesList = Object.values(yearlyData[debouncedSelectedYear]).map(
+      (country) => country.cases
+    );
 
     const minCases = Math.min(...casesList);
     const maxCases = Math.max(...casesList);
 
     setCasesRange([minCases, maxCases]);
-  }, [yearlyData, debouncedSelectedYear])
+  }, [yearlyData, debouncedSelectedYear]);
 
   // Fetch the yearly skin cancer data
   useEffect(() => {
@@ -131,10 +134,13 @@ export default function Home() {
     fetchGeoJSON();
   }, []);
 
-  const getCountryColor = useCallback((countryName) => {
-    const cases = yearlyData[selectedYear][countryName]?.cases;
-    return cases ? getColorFromCases(cases, casesRange) : 'gray';
-  }, [yearlyData, selectedYear, casesRange]);
+  const getCountryColor = useCallback(
+    (countryName) => {
+      const cases = yearlyData[selectedYear][countryName]?.cases;
+      return cases ? getColorFromCases(cases, casesRange) : "gray";
+    },
+    [yearlyData, selectedYear, casesRange]
+  );
 
   return (
     <Layout>
@@ -245,7 +251,6 @@ export default function Home() {
               </label>
             </div>
           </div>
-
           <div
             style={{
               display: "flex",
@@ -333,6 +338,99 @@ export default function Home() {
                 src="uv-idx-scale.png"
                 alt="UV Index Scale"
               />
+            )}
+            {/* Conditionally render the UV Index Scale Image */}
+            {!showUVIndex && (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Color</th>
+                    <th>Cases</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <svg
+                        height="50"
+                        width="50"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle r="10" cx="25" cy="25" fill="rgb(189, 0, 38)" />
+                      </svg>
+                    </td>
+                    <td>&gt;3000</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <svg
+                        height="50"
+                        width="50"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          r="10"
+                          cx="25"
+                          cy="25"
+                          fill="rgb(213, 87, 83)"
+                        />
+                      </svg>
+                    </td>
+                    <td>1000 - 3000</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <svg
+                        height="50"
+                        width="50"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          r="10"
+                          cx="25"
+                          cy="25"
+                          fill="rgb(227, 138, 109)"
+                        />
+                      </svg>
+                    </td>
+                    <td>300 - 1000</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <svg
+                        height="50"
+                        width="50"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          r="10"
+                          cx="25"
+                          cy="25"
+                          fill="rgb(248, 212, 147)"
+                        />
+                      </svg>
+                    </td>
+                    <td>100 - 300</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <svg
+                        height="50"
+                        width="50"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          r="10"
+                          cx="25"
+                          cy="25"
+                          fill="rgb(255, 237, 160)"
+                        />
+                      </svg>
+                    </td>
+                    <td>&lt;100</td>
+                  </tr>
+                </tbody>
+              </table>
             )}
           </div>
         </Container>
