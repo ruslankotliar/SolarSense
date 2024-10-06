@@ -15,7 +15,7 @@ const Header = () => {
             </Link>
           </p>
 
-          <p className={styles.headerSubtitle}>
+          <p className={styles.headerChartsLink}>
             <Link href="/charts">
               Charts
             </Link>

@@ -32,3 +32,39 @@
     aspect-ratio: 1 / 1.5;
   }
 }
+
+.countryTable {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+.mapContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.mapSubContainer {
+  flex-grow: 1;
+  height: 50vh;
+  width: 80%;
+
+  @media (max-width: 768px) {
+    width: 75%;
+  }
+}
+
+.uvIndexScaleContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1em;
+  width: 20%;
+
+  @media (max-width: 768px) {
+    width: 25%;
+  }
+}

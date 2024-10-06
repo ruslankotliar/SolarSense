@@ -28,7 +28,6 @@ const getColorFromCases = (cases, [minCases, maxCases]) => {
   const g = interpolateColor(237, 0, ratio);
   const b = interpolateColor(160, 38, ratio);
 
-  console.log(`rgb(${r}, ${g}, ${b})`);
   return `rgb(${r}, ${g}, ${b})`;
 };
 
@@ -251,15 +250,8 @@ export default function Home() {
               </label>
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between", // Or use "flex-end" to push the image to the right
-              alignItems: "center", // Aligns the image and map vertically in the center
-              width: "100%", // Ensure it takes full width
-            }}
-          >
-            <div style={{ flexGrow: 1 }}>
+          <div className={styles.mapContainer}>
+            <div className={styles.mapSubContainer}>
               <Map
                 className={styles.homeMap}
                 width="1000"
@@ -272,16 +264,13 @@ export default function Home() {
 
                   return (
                     <>
-                      {/* Use the map bounds hook here */}
                       <MapWithBounds useMap={useMap} setBounds={setBounds} />
 
-                      {/* TileLayer (background map layer) */}
                       <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                       />
 
-                      {/* UV Index ImageOverlay */}
                       {imageUrl && bounds && showUVIndex && (
                         <ImageOverlay
                           url={imageUrl}
@@ -291,7 +280,6 @@ export default function Home() {
                         />
                       )}
 
-                      {/* GeoJSON Layer */}
                       {yearlyData && avgUVByCountry && geoData && (
                         <GeoJSON
                           key={selectedYear}
@@ -327,111 +315,16 @@ export default function Home() {
                 }}
               </Map>
             </div>
-            {/* Conditionally render the UV Index Scale Image */}
-            {showUVIndex && (
-              <img
-                style={{
-                  height: "400px",
-                  width: "auto",
-                  marginLeft: "20px",
-                }} // Ensure proper size and spacing
-                src="uv-idx-scale.png"
-                alt="UV Index Scale"
-              />
-            )}
-            {/* Conditionally render the UV Index Scale Image */}
-            {!showUVIndex && (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Color</th>
-                    <th>Cases</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <svg
-                        height="50"
-                        width="50"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle r="10" cx="25" cy="25" fill="rgb(189, 0, 38)" />
-                      </svg>
-                    </td>
-                    <td>&gt;3000</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <svg
-                        height="50"
-                        width="50"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle
-                          r="10"
-                          cx="25"
-                          cy="25"
-                          fill="rgb(213, 87, 83)"
-                        />
-                      </svg>
-                    </td>
-                    <td>1000 - 3000</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <svg
-                        height="50"
-                        width="50"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle
-                          r="10"
-                          cx="25"
-                          cy="25"
-                          fill="rgb(227, 138, 109)"
-                        />
-                      </svg>
-                    </td>
-                    <td>300 - 1000</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <svg
-                        height="50"
-                        width="50"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle
-                          r="10"
-                          cx="25"
-                          cy="25"
-                          fill="rgb(248, 212, 147)"
-                        />
-                      </svg>
-                    </td>
-                    <td>100 - 300</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <svg
-                        height="50"
-                        width="50"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle
-                          r="10"
-                          cx="25"
-                          cy="25"
-                          fill="rgb(255, 237, 160)"
-                        />
-                      </svg>
-                    </td>
-                    <td>&lt;100</td>
-                  </tr>
-                </tbody>
-              </table>
-            )}
+
+            {/* UV Index Scale Container */}
+            <div className={styles.uvIndexScaleContainer}>
+              {showUVIndex ? (
+                <UVIndexScale />
+              ) : (
+                <CountryColorsTable /> // Your table component for country colors
+              )}
+            </div>
+
           </div>
         </Container>
       </Section>
@@ -457,3 +350,48 @@ function MapWithBounds({ useMap, setBounds }) {
 
   return null; // You can render something or just use this hook for side effects
 }
+
+// Reusable SVG Circle component
+const CircleIcon = ({ color }) => (
+  <svg height="50" width="50" xmlns="http://www.w3.org/2000/svg">
+    <circle r="10" cx="25" cy="25" fill={color} />
+  </svg>
+);
+
+// Reusable TableRow component
+const TableRow = ({ color, cases }) => (
+  <tr>
+    <td><CircleIcon color={color} /></td>
+    <td>{cases}</td>
+  </tr>
+);
+
+const CountryColorsTable = () => {
+  const uvCases = [
+    { color: "rgb(189, 0, 38)", cases: "~3000" },
+    { color: "rgb(213, 87, 83)", cases: "~1000" },
+    { color: "rgb(227, 138, 109)", cases: "~300" },
+    { color: "rgb(248, 212, 147)", cases: "~100" },
+    { color: "rgb(255, 237, 160)", cases: "~1" },
+  ];
+
+  return (
+    <table>
+      <tbody className={styles.countryTable}>
+        {uvCases.map((item, index) => (
+          <TableRow key={index} color={item.color} cases={item.cases} />
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+const UVIndexScale = () => (<img
+  style={{
+    height: "400px",
+    width: "auto",
+    marginLeft: "20px",
+  }} // Ensure proper size and spacing
+  src="uv-idx-scale.png"
+  alt="UV Index Scale"
+/>)
