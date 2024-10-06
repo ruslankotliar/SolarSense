@@ -171,7 +171,7 @@ export default function ChartPage() {
                 justifyContent: 'center',
                 flexWrap: 'wrap',
                 width: '100%',
-                height: '50%',
+                height: '70%',
             }}>
                 <div style={{
                 flex: '1 1 300px', // Allows the chart to be responsive and grow/shrink
@@ -202,7 +202,7 @@ export default function ChartPage() {
                 />
                 </div>
 
-                <div style={{
+              <div style={{
                 flex: '1 1 300px', // Allows the chart to be responsive and grow/shrink
                 background: '#fff',
                 padding: '20px',
